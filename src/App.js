@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import EditIcon from "./components/edit-icon"
 import DeleteIcon from "./components/delete-icon"
 
@@ -6,20 +6,34 @@ import DeleteIcon from "./components/delete-icon"
  const App = () => {
     const [todolist, setTodolist] = useState(list)
     const [todo, setTodo] = useState('')
+     const [edit,setEdit] =useState(null)
+
 
     const handleAddTodo = () => {
         if (todo.length) {
-            const newTodo = {
-                id: todolist.length + 1,
-                text: todo,
-                completed: false
-            }
-            setTodo('')
-            setTodolist([...todolist, newTodo])
+           if(!!edit){
+             setTodolist(todolist.map(item => item.id===edit ? {...item,text:todo}:item))
+               setEdit(null)
+               setTodo('')
+           }else {
+               const newTodo = {
+                   id: todolist.length + 1,
+                   text: todo,
+                   completed: false
+               }
+               setTodo('')
+               setTodolist([...todolist, newTodo])
+           }
         }
     }
+
+
     const handleDelete = (id) => {
         setTodolist(todolist.filter(todo => todo.id !== id))
+        }
+        const handleEdit = (todo)=>{
+        setTodo(todo.text)
+            setEdit(todo.id)
         }
         const handleComplete =(id,e) =>{
         setTodolist(todolist.map(todo=>todo.id === id ?{...todo,completed: e.target.checked}: todo))
@@ -35,7 +49,10 @@ import DeleteIcon from "./components/delete-icon"
                       type="text"
                   />
                     <button className={'add-btn'} onClick={handleAddTodo}>
-                        add
+                        { !edit ? 'add' : 'edit'
+
+                        }
+
                     </button>
               </div>
               {
@@ -45,7 +62,9 @@ import DeleteIcon from "./components/delete-icon"
                           <div style={{display:"flex",alignItems:"center"}}>
 
                               { !todo.completed &&
-                                  <button className={'edit-btn'}>
+                                  <button
+                                      onClick={ (e) =>handleEdit(todo)}
+                                      className={'edit-btn'}>
                                       <EditIcon/>
                                   </button>
                               }
